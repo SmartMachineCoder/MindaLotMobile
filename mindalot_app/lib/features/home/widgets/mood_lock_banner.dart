@@ -17,7 +17,6 @@ class _MoodLockBannerState extends State<MoodLockBanner> {
   @override
   void initState() {
     super.initState();
-    // Refresh every second for countdown
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) setState(() {});
     });
@@ -38,9 +37,10 @@ class _MoodLockBannerState extends State<MoodLockBanner> {
       duration: const Duration(milliseconds: 400),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        color: config.primaryColor.withOpacity(0.12),
+        // Semi-transparent backdrop so it's readable on any background
+        color: Colors.black.withValues(alpha: 0.35),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: config.primaryColor.withOpacity(0.3)),
+        border: Border.all(color: config.primaryColor.withValues(alpha: 0.5)),
       ),
       child: Row(
         children: [
@@ -55,13 +55,13 @@ class _MoodLockBannerState extends State<MoodLockBanner> {
                   style: GoogleFonts.nunito(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
-                    color: config.primaryColor,
+                    color: Colors.white,
                   ),
                 ),
                 Text(
                   config.musicDescription,
                   style: GoogleFonts.nunito(
-                      fontSize: 11, color: const Color(0xFF7A6055)),
+                      fontSize: 11, color: Colors.white70),
                 ),
               ],
             ),
@@ -71,7 +71,7 @@ class _MoodLockBannerState extends State<MoodLockBanner> {
             padding:
                 const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: config.primaryColor.withOpacity(0.15),
+              color: config.primaryColor.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -79,7 +79,7 @@ class _MoodLockBannerState extends State<MoodLockBanner> {
               style: GoogleFonts.nunito(
                 fontSize: 13,
                 fontWeight: FontWeight.w800,
-                color: config.primaryColor,
+                color: Colors.white,
               ),
             ),
           ),

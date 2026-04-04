@@ -38,7 +38,7 @@ class CounsellorDashboard extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 if (provider.waitingSessions.isEmpty)
-                  _EmptyState(
+                  const _EmptyState(
                     icon: '☕',
                     message: 'No waiting users right now',
                   )
@@ -70,7 +70,7 @@ class CounsellorDashboard extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 if (provider.activeSessions.isEmpty)
-                  _EmptyState(
+                  const _EmptyState(
                     icon: '💬',
                     message: 'No active chats',
                   )

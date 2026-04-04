@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'core/services/mood_provider.dart';
 import 'core/services/counsellor_provider.dart';
+import 'core/services/audio_service.dart';
 import 'core/theme/app_theme.dart';
 
 import 'features/splash/splash_screen.dart';
@@ -33,6 +34,9 @@ void main() async {
     // In POC mode without Firebase configured, we continue without it
     debugPrint('Firebase init skipped: $e');
   }
+
+  // Pre-load all mood audio files so switching is instant
+  AudioService().preloadAll();
 
   runApp(const MindALotApp());
 }

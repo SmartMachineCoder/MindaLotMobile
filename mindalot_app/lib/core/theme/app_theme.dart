@@ -14,11 +14,10 @@ class AppTheme {
   static ThemeData baseTheme() {
     return ThemeData(
       useMaterial3: true,
-      colorScheme: ColorScheme.light(
+      colorScheme: const ColorScheme.light(
         primary: brandBrown,
-        secondary: const Color(0xFF7DBF8E),
+        secondary: Color(0xFF7DBF8E),
         surface: Colors.white,
-        background: brandMint,
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onSurface: textDark,
@@ -91,7 +90,7 @@ class AppTheme {
       scaffoldBackgroundColor: config.backgroundColor,
       colorScheme: base.colorScheme.copyWith(
         primary: config.primaryColor,
-        background: config.backgroundColor,
+        surface: config.backgroundColor,
       ),
     );
   }

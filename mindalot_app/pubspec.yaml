@@ -23,7 +23,7 @@ dependencies:
   audio_session: ^0.1.18
 
   # Lottie animations for mood backgrounds
-  lottie: ^3.1.0
+  lottie: ^3.3.1
 
   # UI utilities
   google_fonts: ^6.1.0
@@ -36,6 +36,7 @@ dependencies:
 
   # Misc
   uuid: ^4.3.3
+  video_player: ^2.10.0
 
 dev_dependencies:
   flutter_test:
@@ -49,3 +50,4 @@ flutter:
     - assets/images/
     - assets/animations/
     - assets/audio/
+    - assets/video/

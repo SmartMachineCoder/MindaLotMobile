@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/widgets/animated_clouds_background.dart';
+import '../../core/widgets/floating_mascot.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -18,21 +20,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       title: 'Understand your emotions',
       subtitle:
           'Reflect on your day, log your mood, and discover what your mind needs.',
-      bg: Color(0xFFE3F5EC),
     ),
     _Slide(
       emoji: '💙',
       title: 'Real people,\nReal conversations',
       subtitle:
           'Every message you send is read and responded to by certified professionals.',
-      bg: Color(0xFFE3EEF9),
     ),
     _Slide(
       emoji: '📖',
       title: 'Inner Compass:\nYour Guide to Wellness',
       subtitle:
           'Access helpful blogs, daily tips, and guided activities — all in one place.',
-      bg: Color(0xFFFFF4E3),
     ),
   ];
 
@@ -53,8 +52,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
+    return AnimatedCloudsBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Stack(
         children: [
           PageView.builder(
             controller: _controller,
@@ -120,6 +121,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
         ],
       ),
+      ),
     );
   }
 }
@@ -128,31 +130,36 @@ class _Slide extends StatelessWidget {
   final String emoji;
   final String title;
   final String subtitle;
-  final Color bg;
 
   const _Slide({
     required this.emoji,
     required this.title,
     required this.subtitle,
-    required this.bg,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: bg,
+      color: Colors.transparent,
       child: Column(
         children: [
           Expanded(
             flex: 3,
             child: Container(
-              decoration: BoxDecoration(
-                color: bg,
+              decoration: const BoxDecoration(
+                color: Colors.transparent,
                 borderRadius:
-                    const BorderRadius.only(bottomRight: Radius.circular(80)),
+                    BorderRadius.only(bottomRight: Radius.circular(80)),
               ),
               child: Center(
-                child: Text(emoji, style: const TextStyle(fontSize: 100)),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const FloatingMascot(size: 100),
+                    const SizedBox(height: 16),
+                    Text(emoji, style: const TextStyle(fontSize: 80)),
+                  ],
+                ),
               ),
             ),
           ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/widgets/animated_clouds_background.dart';
+import '../../core/widgets/floating_mascot.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -31,18 +33,19 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFDFF2F2),
-      body: SafeArea(
+    return AnimatedCloudsBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 28),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Triple-tap cloud mascot
+              // Triple-tap cloud mascot with floating animation
               GestureDetector(
                 onTap: _onLogoTap,
-                child: _CloudMascot(),
+                child: const FloatingMascot(size: 180),
               ),
               const SizedBox(height: 28),
               Text(
@@ -97,41 +100,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           ),
         ),
       ),
+      ),
     );
   }
 }
 
-class _CloudMascot extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 180,
-      height: 160,
-      decoration: BoxDecoration(
-        color: const Color(0xFFB8DDE0),
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(80),
-          topRight: Radius.circular(80),
-          bottomLeft: Radius.circular(60),
-          bottomRight: Radius.circular(60),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF5BBFBF).withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('☁️', style: TextStyle(fontSize: 60)),
-            Text('🙂', style: TextStyle(fontSize: 28)),
-          ],
-        ),
-      ),
-    );
-  }
-}

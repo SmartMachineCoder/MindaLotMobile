@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import '../../core/models/message.dart';
 import '../../core/models/mood.dart';
 import '../../core/services/chat_service.dart';
-import '../../core/services/counsellor_provider.dart';
 
 class CounsellorChatScreen extends StatefulWidget {
   final String sessionId;
@@ -210,7 +208,7 @@ class _CounsellorChatScreenState extends State<CounsellorChatScreen> {
         title: Text('Delete message?',
             style: GoogleFonts.nunito(fontWeight: FontWeight.w800)),
         content: Text(
-          '"${msg.text.length > 50 ? msg.text.substring(0, 50) + '...' : msg.text}"',
+          '"${msg.text.length > 50 ? '${msg.text.substring(0, 50)}...' : msg.text}"',
           style: GoogleFonts.nunito(
               fontSize: 14, fontStyle: FontStyle.italic),
         ),

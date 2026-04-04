@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/services/auth_service.dart';
+import '../../core/widgets/animated_clouds_background.dart';
+import '../../core/widgets/floating_mascot.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -67,19 +69,21 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFE8F4F4),
-      body: Stack(
-        children: [
-          // Floating cloud background decoration
-          _CloudBackground(),
-          SafeArea(
+    return AnimatedCloudsBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Stack(
+          children: [
+            SafeArea(
             child: Center(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(
                     horizontal: 28, vertical: 24),
                 child: Column(
                   children: [
+                    // Floating mascot above logo
+                    const FloatingMascot(size: 110),
+                    const SizedBox(height: 12),
                     // Triple-tap logo — hidden counsellor entry
                     GestureDetector(
                       onTap: _onLogoTap,
@@ -277,63 +281,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ],
       ),
+      ),
     );
   }
-}
-
-/// Floating cloud decorations — matches existing app screenshot aesthetic
-class _CloudBackground extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Positioned.fill(
-      child: CustomPaint(painter: _CloudPainter()),
-    );
-  }
-}
-
-class _CloudPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFFB8DDE0).withOpacity(0.45)
-      ..style = PaintingStyle.fill;
-
-    // Top left cloud
-    _drawCloud(canvas, paint, Offset(size.width * 0.15, size.height * 0.07),
-        60, 35);
-    // Top right cloud
-    _drawCloud(canvas, paint, Offset(size.width * 0.78, size.height * 0.04),
-        80, 45);
-    // Mid left cloud
-    _drawCloud(canvas, paint, Offset(size.width * 0.05, size.height * 0.25),
-        50, 28);
-    // Mid right cloud
-    _drawCloud(canvas, paint, Offset(size.width * 0.82, size.height * 0.2),
-        70, 38);
-    // Big center cloud
-    _drawCloud(canvas, paint, Offset(size.width * 0.5, size.height * 0.13),
-        110, 60);
-  }
-
-  void _drawCloud(
-      Canvas canvas, Paint paint, Offset center, double w, double h) {
-    final path = Path();
-    // Simple pill + bumps cloud shape
-    final rect =
-        Rect.fromCenter(center: center, width: w, height: h * 0.6);
-    path.addRRect(RRect.fromRectAndRadius(rect, Radius.circular(h * 0.3)));
-    // Top bumps
-    path.addOval(Rect.fromCenter(
-        center: Offset(center.dx - w * 0.2, center.dy - h * 0.25),
-        width: h * 0.7,
-        height: h * 0.7));
-    path.addOval(Rect.fromCenter(
-        center: Offset(center.dx + w * 0.15, center.dy - h * 0.3),
-        width: h * 0.8,
-        height: h * 0.8));
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter _) => false;
 }

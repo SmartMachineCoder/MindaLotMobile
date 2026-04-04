@@ -8,8 +8,8 @@ class MoodProvider extends ChangeNotifier {
   DateTime? _moodLockedUntil;
   bool _isMuted = false;
 
-  // Mood lock duration — 1 hour in production; 5 min for POC demo
-  static const Duration lockDuration = Duration(minutes: 5);
+  // Mood lock duration — 10 seconds for testing/POC demo
+  static const Duration lockDuration = Duration(seconds: 10);
 
   MoodType get currentMood => _currentMood;
   MoodConfig get currentConfig => MoodData.get(_currentMood);

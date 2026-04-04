@@ -11,7 +11,7 @@ class MoodConfig {
   final Color backgroundColor;
   final Color accentColor;
   final String lottieAsset;       // assets/animations/mood_xxx.json
-  final String audioAsset;        // assets/audio/mood_xxx.mp3
+  final String audioAsset;        // assets/audio/mood_xxx.wav
   final String backgroundDescription;
   final String musicDescription;
 
@@ -41,7 +41,7 @@ class MoodData {
       backgroundColor: Color(0xFFFFF8E1),
       accentColor: Color(0xFFE6A800),
       lottieAsset: 'assets/animations/mood_happy.json',
-      audioAsset: 'assets/audio/mood_happy.mp3',
+      audioAsset: 'assets/audio/mood_happy.wav',
       backgroundDescription: 'Golden sunrise meadow',
       musicDescription: 'Birdsong & acoustic guitar',
     ),
@@ -54,7 +54,7 @@ class MoodData {
       backgroundColor: Color(0xFFFFF0E6),
       accentColor: Color(0xFFB5603A),
       lottieAsset: 'assets/animations/mood_sad.json',
-      audioAsset: 'assets/audio/mood_sad.mp3',
+      audioAsset: 'assets/audio/mood_sad.wav',
       backgroundDescription: 'Cozy rain & candlelight',
       musicDescription: 'Soft piano & gentle rain',
     ),
@@ -67,7 +67,7 @@ class MoodData {
       backgroundColor: Color(0xFFEEF7F0),
       accentColor: Color(0xFF4A9B60),
       lottieAsset: 'assets/animations/mood_anxious.json',
-      audioAsset: 'assets/audio/mood_anxious.mp3',
+      audioAsset: 'assets/audio/mood_anxious.wav',
       backgroundDescription: 'Forest canopy & sunlight',
       musicDescription: 'Forest sounds & theta binaural beats',
     ),
@@ -80,7 +80,7 @@ class MoodData {
       backgroundColor: Color(0xFFE3F2F9),
       accentColor: Color(0xFF1A4F6E),
       lottieAsset: 'assets/animations/mood_angry.json',
-      audioAsset: 'assets/audio/mood_angry.mp3',
+      audioAsset: 'assets/audio/mood_angry.wav',
       backgroundDescription: 'Vast open ocean waves',
       musicDescription: 'Rhythmic ocean waves',
     ),
@@ -93,7 +93,7 @@ class MoodData {
       backgroundColor: Color(0xFFF3EEFF),
       accentColor: Color(0xFF6A4DB8),
       lottieAsset: 'assets/animations/mood_confused.json',
-      audioAsset: 'assets/audio/mood_confused.mp3',
+      audioAsset: 'assets/audio/mood_confused.wav',
       backgroundDescription: 'Starry cosmos',
       musicDescription: 'Soft orchestral — Bach & Mozart',
     ),
