@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import '../../core/services/mood_provider.dart';
 
 /// Call Booking screen per SRS 4.6.
 /// User selects: date → time slot → call type (audio/video) → confirm.
@@ -134,9 +132,6 @@ class _CallBookingScreenState extends State<CallBookingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final moodProvider = context.watch<MoodProvider>();
-    final config = moodProvider.currentConfig;
-
     return Scaffold(
       backgroundColor: const Color(0xFFF5F0ED),
       appBar: AppBar(

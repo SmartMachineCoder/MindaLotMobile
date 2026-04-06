@@ -10,41 +10,59 @@ class OnboardingScreen extends StatefulWidget {
   State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
-  final _controller = PageController();
+class _OnboardingScreenState extends State<OnboardingScreen>
+    with SingleTickerProviderStateMixin {
+  final _pageCtrl = PageController();
   int _page = 0;
+  late AnimationController _slideCtrl;
 
-  final _slides = const [
+  static const _slides = [
     _Slide(
-      emoji: '📣',
+      emoji: '🧠',
+      tag: 'Self Awareness',
       title: 'Understand your emotions',
       subtitle:
-          'Reflect on your day, log your mood, and discover what your mind needs.',
+          'Reflect on your day, log your mood, and discover what your mind truly needs.',
+      accent: Color(0xFF5C9EAD),
     ),
     _Slide(
-      emoji: '💙',
+      emoji: '💬',
+      tag: 'Real Support',
       title: 'Real people,\nReal conversations',
       subtitle:
-          'Every message you send is read and responded to by certified professionals.',
+          'Every message is read and responded to by certified mental health professionals.',
+      accent: Color(0xFF7A6BAD),
     ),
     _Slide(
-      emoji: '📖',
-      title: 'Inner Compass:\nYour Guide to Wellness',
+      emoji: '🌱',
+      tag: 'Daily Growth',
+      title: 'Your guide\nto wellness',
       subtitle:
-          'Access helpful blogs, daily tips, and guided activities — all in one place.',
+          'Access guided activities, daily tips, and personalized content — all in one place.',
+      accent: Color(0xFF5C9E7A),
     ),
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _slideCtrl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 450))
+      ..forward();
+  }
+
+  @override
   void dispose() {
-    _controller.dispose();
+    _pageCtrl.dispose();
+    _slideCtrl.dispose();
     super.dispose();
   }
 
   void _next() {
     if (_page < _slides.length - 1) {
-      _controller.nextPage(
-          duration: const Duration(milliseconds: 350), curve: Curves.easeInOut);
+      _pageCtrl.nextPage(
+          duration: const Duration(milliseconds: 380),
+          curve: Curves.easeInOut);
     } else {
       Navigator.pushReplacementNamed(context, '/welcome');
     }
@@ -52,144 +70,257 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
     return AnimatedCloudsBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Stack(
-        children: [
-          PageView.builder(
-            controller: _controller,
-            itemCount: _slides.length,
-            onPageChanged: (i) => setState(() => _page = i),
-            itemBuilder: (_, i) => _slides[i],
-          ),
-          // Skip button
-          Positioned(
-            top: 52,
-            right: 24,
-            child: TextButton(
-              onPressed: () =>
-                  Navigator.pushReplacementNamed(context, '/welcome'),
-              child: Text('Skip',
-                  style: GoogleFonts.nunito(
-                      color: const Color(0xFF7A6055), fontSize: 16)),
+          children: [
+            PageView.builder(
+              controller: _pageCtrl,
+              itemCount: _slides.length,
+              onPageChanged: (i) {
+                setState(() => _page = i);
+                _slideCtrl.forward(from: 0);
+              },
+              itemBuilder: (_, i) => _SlidePage(
+                slide: _slides[i],
+                size: size,
+                anim: _slideCtrl,
+              ),
             ),
-          ),
-          // Dots + Next
-          Positioned(
-            bottom: 48,
-            left: 24,
-            right: 24,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: List.generate(
-                    _slides.length,
-                    (i) => AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      margin: const EdgeInsets.only(right: 6),
-                      width: _page == i ? 24 : 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: _page == i
-                            ? const Color(0xFF5C3D2E)
-                            : const Color(0xFFD4C5BC),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
+
+            // Skip
+            Positioned(
+              top: size.height * 0.062,
+              right: 24,
+              child: SafeArea(
+                child: TextButton(
+                  onPressed: () =>
+                      Navigator.pushReplacementNamed(context, '/welcome'),
+                  child: Text(
+                    'Skip',
+                    style: GoogleFonts.nunito(
+                      color: const Color(0xFF7A6055),
+                      fontSize: size.width * 0.038,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
-                ElevatedButton(
-                  onPressed: _next,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF5C3D2E),
-                    minimumSize: const Size(120, 50),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30)),
-                  ),
-                  child: Text(
-                    _page == _slides.length - 1 ? 'Get Started' : 'Next',
-                    style: GoogleFonts.nunito(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ],
-      ),
+
+            // Bottom bar
+            Positioned(
+              bottom: size.height * 0.055,
+              left: 28,
+              right: 28,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Dots
+                  Row(
+                    children: List.generate(_slides.length, (i) {
+                      final active = _page == i;
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        margin: const EdgeInsets.only(right: 7),
+                        width: active ? 26 : 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: active
+                              ? _slides[_page].accent
+                              : const Color(0xFFD4C5BC),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      );
+                    }),
+                  ),
+
+                  // Next button
+                  GestureDetector(
+                    onTap: _next,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: size.width * 0.065,
+                        vertical: size.height * 0.016,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _slides[_page].accent,
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: [
+                          BoxShadow(
+                            color: _slides[_page].accent.withValues(alpha: 0.35),
+                            blurRadius: 18,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        _page == _slides.length - 1
+                            ? 'Get Started'
+                            : 'Next  →',
+                        style: GoogleFonts.nunito(
+                          fontSize: size.width * 0.038,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _Slide extends StatelessWidget {
+class _Slide {
   final String emoji;
+  final String tag;
   final String title;
   final String subtitle;
+  final Color accent;
+  const _Slide(
+      {required this.emoji,
+      required this.tag,
+      required this.title,
+      required this.subtitle,
+      required this.accent});
+}
 
-  const _Slide({
-    required this.emoji,
-    required this.title,
-    required this.subtitle,
-  });
+class _SlidePage extends StatelessWidget {
+  final _Slide slide;
+  final Size size;
+  final AnimationController anim;
+  const _SlidePage(
+      {required this.slide, required this.size, required this.anim});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.transparent,
+    return SafeArea(
       child: Column(
         children: [
+          // Mascot + emoji badge
+          SizedBox(
+            height: size.height * 0.52,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Glow behind mascot
+                Container(
+                  width: size.width * 0.55,
+                  height: size.width * 0.55,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        slide.accent.withValues(alpha: 0.18),
+                        slide.accent.withValues(alpha: 0.0),
+                      ],
+                    ),
+                  ),
+                ),
+                // Mascot
+                Positioned(
+                  top: size.height * 0.04,
+                  child: FloatingMascot(size: size.width * 0.30),
+                ),
+                // Emoji badge
+                Positioned(
+                  bottom: size.height * 0.04,
+                  child: FadeTransition(
+                    opacity: anim,
+                    child: SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0, 0.4),
+                        end: Offset.zero,
+                      ).animate(CurvedAnimation(
+                          parent: anim, curve: Curves.easeOutCubic)),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: size.width * 0.055,
+                          vertical: size.height * 0.016,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: slide.accent.withValues(alpha: 0.22),
+                              blurRadius: 20,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(slide.emoji,
+                                style: TextStyle(
+                                    fontSize: size.width * 0.09)),
+                            SizedBox(width: size.width * 0.028),
+                            Text(
+                              slide.tag,
+                              style: GoogleFonts.nunito(
+                                fontSize: size.width * 0.038,
+                                fontWeight: FontWeight.w800,
+                                color: slide.accent,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Text section
           Expanded(
-            flex: 3,
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.transparent,
-                borderRadius:
-                    BorderRadius.only(bottomRight: Radius.circular(80)),
-              ),
-              child: Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: size.width * 0.08),
+              child: FadeTransition(
+                opacity: anim,
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const FloatingMascot(size: 100),
-                    const SizedBox(height: 16),
-                    Text(emoji, style: const TextStyle(fontSize: 80)),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        slide.title,
+                        style: GoogleFonts.nunito(
+                          fontSize: size.width * 0.072,
+                          fontWeight: FontWeight.w900,
+                          color: const Color(0xFF2C1810),
+                          height: 1.18,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: size.height * 0.014),
+                    Text(
+                      slide.subtitle,
+                      style: GoogleFonts.nunito(
+                        fontSize: size.width * 0.038,
+                        color: const Color(0xFF7A6055),
+                        height: 1.6,
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
           ),
-          Expanded(
-            flex: 2,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: GoogleFonts.nunito(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w800,
-                        color: const Color(0xFF2C1810)),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    subtitle,
-                    style: GoogleFonts.nunito(
-                        fontSize: 16,
-                        color: const Color(0xFF7A6055),
-                        height: 1.5),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 80),
+
+          SizedBox(height: size.height * 0.13),
         ],
       ),
     );

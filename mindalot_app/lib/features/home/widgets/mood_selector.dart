@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'dart:math' as math;
 import '../../../core/models/mood.dart';
 import '../../../core/services/mood_provider.dart';
 

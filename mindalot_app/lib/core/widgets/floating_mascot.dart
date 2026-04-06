@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
-/// Animated cloud mascot with constant floating/bobbing motion.
-/// The mascot gently drifts up-down and sways side-to-side, with blinking eyes
-/// and a subtle breathing scale effect — always alive, never static.
+// Max rendered size — prevents overflow on desktop/tablet previews
+const double _kMaxMascotSize = 180.0;
+
+/// Fluffy white cloud mascot with blinking eyes, rosy cheeks,
+/// gentle float/sway and subtle breathing scale — always alive.
 class FloatingMascot extends StatefulWidget {
   final double size;
   final bool showFace;
-
-  const FloatingMascot({
-    super.key,
-    this.size = 140,
-    this.showFace = true,
-  });
+  const FloatingMascot({super.key, this.size = 140, this.showFace = true});
 
   @override
   State<FloatingMascot> createState() => _FloatingMascotState();
@@ -20,78 +17,65 @@ class FloatingMascot extends StatefulWidget {
 
 class _FloatingMascotState extends State<FloatingMascot>
     with TickerProviderStateMixin {
-  late AnimationController _floatController;
-  late AnimationController _blinkController;
-  late AnimationController _breatheController;
+  late AnimationController _floatCtrl;
+  late AnimationController _blinkCtrl;
+  late AnimationController _breathCtrl;
 
   @override
   void initState() {
     super.initState();
-
-    // Gentle up-down + sway loop (6 seconds)
-    _floatController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 6),
-    )..repeat();
-
-    // Blink every ~3.5 seconds
-    _blinkController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-    );
-    _startBlinkLoop();
-
-    // Subtle breathing scale (5 seconds)
-    _breatheController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 5),
-    )..repeat(reverse: true);
+    _floatCtrl = AnimationController(
+        vsync: this, duration: const Duration(seconds: 6))
+      ..repeat();
+    _blinkCtrl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 180));
+    _breathCtrl = AnimationController(
+        vsync: this, duration: const Duration(seconds: 5))
+      ..repeat(reverse: true);
+    _startBlink();
   }
 
-  void _startBlinkLoop() async {
+  void _startBlink() async {
     while (mounted) {
-      await Future.delayed(Duration(milliseconds: 2800 + (math.Random().nextInt(1500))));
+      await Future.delayed(
+          Duration(milliseconds: 2600 + math.Random().nextInt(1800)));
       if (!mounted) return;
-      await _blinkController.forward();
+      await _blinkCtrl.forward();
       if (!mounted) return;
-      await _blinkController.reverse();
+      await _blinkCtrl.reverse();
     }
   }
 
   @override
   void dispose() {
-    _floatController.dispose();
-    _blinkController.dispose();
-    _breatheController.dispose();
+    _floatCtrl.dispose();
+    _blinkCtrl.dispose();
+    _breathCtrl.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: Listenable.merge([_floatController, _breatheController]),
+      animation: Listenable.merge([_floatCtrl, _breathCtrl]),
       builder: (_, child) {
-        final floatProgress = _floatController.value * 2 * math.pi;
-        final dy = math.sin(floatProgress) * 12; // bob up/down 12px
-        final dx = math.cos(floatProgress * 0.7) * 6; // sway 6px
-        final tilt = math.sin(floatProgress * 0.5) * 0.03; // subtle tilt
-        final breatheScale = 1.0 + _breatheController.value * 0.05; // 5% scale
-
+        final t = _floatCtrl.value * math.pi * 2;
+        final dy = math.sin(t) * 11;
+        final dx = math.cos(t * 0.7) * 5;
+        final tilt = math.sin(t * 0.5) * 0.03;
+        final breathe = 1.0 + _breathCtrl.value * 0.04;
         return Transform.translate(
           offset: Offset(dx, dy),
           child: Transform.rotate(
             angle: tilt,
-            child: Transform.scale(
-              scale: breatheScale,
-              child: child,
-            ),
+            child: Transform.scale(scale: breathe, child: child),
           ),
         );
       },
       child: _MascotBody(
-        size: widget.size,
+        size: math.min(widget.size, _kMaxMascotSize),
         showFace: widget.showFace,
-        blinkController: _blinkController,
+        blinkCtrl: _blinkCtrl,
       ),
     );
   }
@@ -100,40 +84,33 @@ class _FloatingMascotState extends State<FloatingMascot>
 class _MascotBody extends StatelessWidget {
   final double size;
   final bool showFace;
-  final AnimationController blinkController;
-
-  const _MascotBody({
-    required this.size,
-    required this.showFace,
-    required this.blinkController,
-  });
+  final AnimationController blinkCtrl;
+  const _MascotBody(
+      {required this.size,
+      required this.showFace,
+      required this.blinkCtrl});
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: size,
-      height: size * 0.85,
+      height: size * 0.86,
       child: CustomPaint(
-        painter: _CloudMascotPainter(),
+        painter: _CloudPainter(),
         child: showFace
             ? Center(
                 child: Padding(
-                  padding: EdgeInsets.only(top: size * 0.05),
+                  padding: EdgeInsets.only(top: size * 0.04),
                   child: AnimatedBuilder(
-                    animation: blinkController,
-                    builder: (_, __) {
-                      final blinkValue = blinkController.value;
-                      return Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Left eye
-                          _Eye(size: size * 0.09, blinkValue: blinkValue),
-                          SizedBox(width: size * 0.12),
-                          // Right eye
-                          _Eye(size: size * 0.09, blinkValue: blinkValue),
-                        ],
-                      );
-                    },
+                    animation: blinkCtrl,
+                    builder: (_, __) => Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _Eye(size: size * 0.095, blink: blinkCtrl.value),
+                        SizedBox(width: size * 0.13),
+                        _Eye(size: size * 0.095, blink: blinkCtrl.value),
+                      ],
+                    ),
                   ),
                 ),
               )
@@ -145,82 +122,87 @@ class _MascotBody extends StatelessWidget {
 
 class _Eye extends StatelessWidget {
   final double size;
-  final double blinkValue;
-
-  const _Eye({required this.size, required this.blinkValue});
+  final double blink;
+  const _Eye({required this.size, required this.blink});
 
   @override
   Widget build(BuildContext context) {
-    final eyeHeight = size * (1.0 - blinkValue * 0.9);
     return Container(
       width: size,
-      height: eyeHeight,
+      height: size * (1.0 - blink * 0.9),
       decoration: BoxDecoration(
         color: const Color(0xFF3D2010),
-        borderRadius: BorderRadius.circular(size / 2),
+        borderRadius: BorderRadius.circular(size),
       ),
     );
   }
 }
 
-class _CloudMascotPainter extends CustomPainter {
+class _CloudPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final bw = size.width * 0.46;
+    final bh = size.height * 0.30;
+
+    // Drop shadow
+    canvas.drawOval(
+      Rect.fromCenter(
+          center: Offset(cx, cy + bh * 0.85),
+          width: bw * 1.8,
+          height: bh * 0.45),
+      Paint()
+        ..color = const Color(0xFF90CAD6).withValues(alpha: 0.28)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 14),
+    );
+
+    final fill = Paint()
       ..color = Colors.white
       ..style = PaintingStyle.fill;
 
-    final shadowPaint = Paint()
-      ..color = const Color(0xFFB8DDE0).withValues(alpha:0.4)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 15);
-
-    final cx = size.width / 2;
-    final cy = size.height / 2;
-    final baseW = size.width * 0.45;
-    final baseH = size.height * 0.3;
-
-    // Shadow
-    canvas.drawOval(
-      Rect.fromCenter(center: Offset(cx, cy + baseH * 0.8), width: baseW * 1.8, height: baseH * 0.5),
-      shadowPaint,
+    // Body
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromCenter(
+            center: Offset(cx, cy + bh * 0.16),
+            width: bw * 2,
+            height: bh * 1.4),
+        Radius.circular(bh * 0.72),
+      ),
+      fill,
     );
-
-    // Main cloud body - rounded rectangle base
-    final bodyRect = RRect.fromRectAndRadius(
-      Rect.fromCenter(center: Offset(cx, cy + baseH * 0.15), width: baseW * 2, height: baseH * 1.4),
-      Radius.circular(baseH * 0.7),
-    );
-    canvas.drawRRect(bodyRect, paint);
-
-    // Top bumps (three rounded humps to look cloud-like)
-    // Center bump (biggest)
-    canvas.drawCircle(Offset(cx, cy - baseH * 0.45), baseW * 0.55, paint);
+    // Centre bump (largest)
+    canvas.drawCircle(Offset(cx, cy - bh * 0.44), bw * 0.56, fill);
     // Left bump
-    canvas.drawCircle(Offset(cx - baseW * 0.55, cy - baseH * 0.1), baseW * 0.42, paint);
+    canvas.drawCircle(Offset(cx - bw * 0.56, cy - bh * 0.10), bw * 0.43, fill);
     // Right bump
-    canvas.drawCircle(Offset(cx + baseW * 0.5, cy - baseH * 0.15), baseW * 0.38, paint);
+    canvas.drawCircle(Offset(cx + bw * 0.51, cy - bh * 0.15), bw * 0.39, fill);
 
-    // Subtle rosy cheeks
-    final cheekPaint = Paint()
-      ..color = const Color(0xFFFFB7B7).withValues(alpha:0.35)
+    // Rosy cheeks
+    final cheek = Paint()
+      ..color = const Color(0xFFFFB7B7).withValues(alpha: 0.38)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+    canvas.drawCircle(
+        Offset(cx - bw * 0.52, cy + bh * 0.16), size.width * 0.065, cheek);
+    canvas.drawCircle(
+        Offset(cx + bw * 0.52, cy + bh * 0.16), size.width * 0.065, cheek);
 
-    canvas.drawCircle(Offset(cx - baseW * 0.5, cy + baseH * 0.15), size.width * 0.06, cheekPaint);
-    canvas.drawCircle(Offset(cx + baseW * 0.5, cy + baseH * 0.15), size.width * 0.06, cheekPaint);
-
-    // Small smile
-    final smilePaint = Paint()
-      ..color = const Color(0xFF3D2010).withValues(alpha:0.6)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0
-      ..strokeCap = StrokeCap.round;
-
-    final smilePath = Path();
-    smilePath.moveTo(cx - size.width * 0.06, cy + baseH * 0.25);
-    smilePath.quadraticBezierTo(cx, cy + baseH * 0.42, cx + size.width * 0.06, cy + baseH * 0.25);
-    canvas.drawPath(smilePath, smilePaint);
+    // Smile
+    final smile = Path()
+      ..moveTo(cx - size.width * 0.065, cy + bh * 0.26)
+      ..quadraticBezierTo(cx, cy + bh * 0.44, cx + size.width * 0.065,
+          cy + bh * 0.26);
+    canvas.drawPath(
+      smile,
+      Paint()
+        ..color = const Color(0xFF3D2010).withValues(alpha: 0.55)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.0
+        ..strokeCap = StrokeCap.round,
+    );
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant CustomPainter _) => false;
 }

@@ -8,8 +8,8 @@ class MoodProvider extends ChangeNotifier {
   DateTime? _moodLockedUntil;
   bool _isMuted = false;
 
-  // Mood lock duration — 10 seconds for testing/POC demo
-  static const Duration lockDuration = Duration(seconds: 10);
+  // Mood lock duration — disabled for POC demo
+  static const Duration lockDuration = Duration.zero;
 
   MoodType get currentMood => _currentMood;
   MoodConfig get currentConfig => MoodData.get(_currentMood);
@@ -56,16 +56,16 @@ class MoodProvider extends ChangeNotifier {
     _currentMood = mood;
     _moodLockedUntil = DateTime.now().add(lockDuration);
 
-    // Persist
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('currentMood', mood.name);
-    await prefs.setInt(
-        'moodLockedUntil', _moodLockedUntil!.millisecondsSinceEpoch);
-
-    // Play audio
-    await AudioService().playMoodAudio(mood);
-
+    // Notify UI immediately — background and audio fire without delay
     notifyListeners();
+
+    // Persist and play audio in background (non-blocking)
+    SharedPreferences.getInstance().then((prefs) {
+      prefs.setString('currentMood', mood.name);
+      prefs.setInt(
+          'moodLockedUntil', _moodLockedUntil!.millisecondsSinceEpoch);
+    });
+    AudioService().playMoodAudio(mood);
   }
 
   Future<void> toggleMute() async {

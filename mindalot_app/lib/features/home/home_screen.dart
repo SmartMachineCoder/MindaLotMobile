@@ -421,7 +421,7 @@ class _ActionButtons extends StatelessWidget {
       children: [
         Expanded(
           child: OutlinedButton.icon(
-            onPressed: () {},
+            onPressed: () => Navigator.pushNamed(context, '/call-booking'),
             icon: Icon(Icons.phone_outlined, color: outlineColor),
             label: Text('Call',
                 style: GoogleFonts.nunito(
